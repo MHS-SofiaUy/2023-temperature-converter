@@ -98,19 +98,48 @@ class Converter:
         except ValueError:
             has_error = "yes"
 
-        # If the number is invalid, display error message
+        # Sets var_has_error so that entry box and
+        # labels can be correctly formatted by formatting function
         if has_error == "yes":
-            self.temp_error.config(text=error, fg="#9C0000")
-        else:
-            self.temp_error.config(text="You are OK", fg="blue")
+            self.var_has_error.set("yes")
+            self.var_feedback.set(error)
+            return "invalid"
 
-            # if we have at least one valid calculation,
-            # enable history / export button
+        # if we have no errors...
+        else:
+            # set to 'no' in case of previous errors
+            self.var_has_error.set("no")
+
+            # return number to be
+            # converted and enable history button
             self.to_history_button.config(state=NORMAL)
+            return response
 
     # check temperature is more than -459 and convert it
     def to_celsius(self):
-        self.check_temp(-459)
+        to_convert = self.check_temp(-459)
+
+        if to_convert != "invalid":
+            # do calculation
+            self.var_feedback.set("Converting {} to"
+                                  "C :)".format(to_convert))
+
+    # shows user output and clears entry widget
+    # ready for next calculation
+    def output_answer(self):
+        output = self.var_feedback.get()
+        has_errors = self.var_has_error.get()
+
+        if has_errors == "yes":
+            # red text, pink entry box
+            self.temp_error.config(fg="#9C0000")
+            self.temp_entry.config(bg="#F8CECC")
+
+        else:
+            self.temp_error.config(fg="#004C00")
+            self.temp_entry.config(bg="#FFFFFF")
+
+        self.temp_error.config(text=output)
 
 
 # main routine
